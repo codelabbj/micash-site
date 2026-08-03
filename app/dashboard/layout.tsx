@@ -1,102 +1,98 @@
 "use client"
 
 import React, { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useAuth } from "@/lib/auth-context"
-import { Loader2, Bell } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
-import Image from "next/image"
+import { LayoutGrid, Loader2, ReceiptText, Ticket, User2 } from "lucide-react"
+import { transactionApi } from "@/lib/api-client"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
+  const pathname = usePathname()
   const { user, isLoading } = useAuth()
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      router.push("/login")
-    }
+    if (!isLoading && !user) router.push("/login")
   }, [user, isLoading, router])
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] dark:bg-[#0a0f1a]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative">
-            <div className="w-16 h-16 rounded-full border-4 border-[#3FA9FF]/20 border-t-[#3FA9FF] animate-spin" />
-          </div>
-          <p className="text-slate-500 dark:text-slate-400 font-medium">Chargement...</p>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-7 w-7 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Chargement...</p>
         </div>
       </div>
     )
   }
 
-  if (!user) {
-    return null
+  if (!user) return null
+
+  /* ── Coupon nav item with deposit-gate check ── */
+  const handleCouponNav = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    try {
+      const data = await transactionApi.getHistory({ type_trans: "deposit", status: "accept", page_size: 1 })
+      if (data.results && data.results.length > 0) {
+        router.push("/dashboard/coupon")
+      } else {
+        // No accepted deposit — go to dashboard which will show the gate
+        router.push("/dashboard/coupon")
+      }
+    } catch {
+      router.push("/dashboard/coupon")
+    }
   }
 
-  const userInitials = `${user.first_name?.[0] || ""}${user.last_name?.[0] || ""}`.toUpperCase()
+  const navItems = [
+    { href: "/dashboard",         label: "Accueil",    icon: LayoutGrid,  onClick: undefined },
+    { href: "/dashboard/history", label: "Historique", icon: ReceiptText, onClick: undefined },
+    { href: "/dashboard/coupon",  label: "Coupons",    icon: Ticket,      onClick: handleCouponNav },
+    { href: "/dashboard/profile", label: "Profil",     icon: User2,       onClick: undefined },
+  ]
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0a0f1a]">
-      {/* Top Header - Simple */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex h-16 items-center justify-between">
-            {/* Logo */}
-            <Link href="/dashboard" className="flex items-center">
-              <Image
-                src="/1xstore-logo.png"
-                alt="1xstore"
-                width={110}
-                height={35}
-                className="h-8 w-auto"
-                priority
-              />
-            </Link>
+    <div className="min-h-screen pb-20">
+      {/* Page content */}
+      <div className="mx-auto max-w-2xl px-4 pt-5 sm:px-5">
+        {children}
+      </div>
 
-            {/* Right Side */}
-            <div className="flex items-center gap-2">
-              {/* Notifications */}
-              <Link
-                href="/notifications"
-                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-              >
-                <Bell className="w-5 h-5" />
-              </Link>
-
-              {/* Theme */}
-              <ThemeToggle />
-
-              {/* Profile */}
-              <Link
-                href="/dashboard/profile"
-                className="w-10 h-10 rounded-full bg-gradient-to-br from-[#3FA9FF] to-[#0066FF] flex items-center justify-center text-white font-semibold text-sm shadow-lg shadow-blue-500/20"
-              >
-                {userInitials}
-              </Link>
-            </div>
+      {/* Bottom navigation */}
+      <nav className="fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/90 backdrop-blur-md">
+        <div className="mx-auto max-w-2xl px-2">
+          <div className="flex items-center justify-around py-1">
+            {navItems.map(({ href, label, icon: Icon, onClick }) => {
+              const isActive =
+                pathname === href ||
+                (href !== "/dashboard" && pathname.startsWith(href))
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={onClick}
+                  className={`flex flex-col items-center gap-1 px-4 py-2.5 rounded-xl transition-all duration-200 min-w-[60px] ${
+                    isActive
+                      ? "text-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <div className="relative flex h-6 w-6 items-center justify-center">
+                    <Icon className="h-5 w-5" strokeWidth={isActive ? 2.5 : 1.8} />
+                    {isActive && (
+                      <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-primary" />
+                    )}
+                  </div>
+                  <span className={`text-[10px] leading-none ${isActive ? "font-semibold" : "font-medium"}`}>
+                    {label}
+                  </span>
+                </Link>
+              )
+            })}
           </div>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-        {children}
-      </main>
-
-
-      {/* Footer - Desktop only */}
-      {/* <footer className="hidden sm:block mt-12 py-6 border-t border-slate-200/50 dark:border-slate-800/50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <p className="text-center text-sm text-slate-400 dark:text-slate-500">
-            © 2024 1xstore • Développé par{" "}
-            <a href="https://wa.me/22947030588" target="_blank" rel="noopener noreferrer" className="text-[#3FA9FF] hover:underline">
-              Code Lab
-            </a>
-          </p>
-        </div>
-      </footer> */}
+      </nav>
     </div>
   )
 }

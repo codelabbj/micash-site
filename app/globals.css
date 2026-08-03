@@ -4,34 +4,30 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================
-   BLUE HORIZON DESIGN SYSTEM
-   Primary: #3FA9FF (Light Blue)
-   Mobile-First, Responsive Web Design
+   AURORA COMMAND DESIGN SYSTEM
+   Premium transaction platform styling
    ============================================ */
 
 :root {
-  /* Blue Horizon Color Palette - Light Mode */
-  --background: oklch(0.98 0.005 220);
-  --foreground: oklch(0.18 0.02 240);
+  /* Aurora Command - Light Mode */
+  --background: oklch(0.985 0.004 245);
+  --foreground: oklch(0.24 0.026 257);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.02 240);
+  --card-foreground: oklch(0.24 0.026 257);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.02 240);
+  --popover-foreground: oklch(0.24 0.026 257);
   
-  /* Primary - Blue Horizon Light Blue */
-  --primary: #3FA9FF;
+  /* Core brand tones */
+  --primary: #2563eb;
   --primary-foreground: oklch(1 0 0);
   
-  /* Secondary */
-  --secondary: oklch(0.96 0.015 220);
-  --secondary-foreground: oklch(0.25 0.02 240);
+  --secondary: oklch(0.95 0.01 244);
+  --secondary-foreground: oklch(0.28 0.025 257);
   
-  /* Muted */
-  --muted: oklch(0.95 0.01 220);
-  --muted-foreground: oklch(0.48 0.02 240);
+  --muted: oklch(0.955 0.008 244);
+  --muted-foreground: oklch(0.52 0.02 252);
   
-  /* Accent - Slightly deeper blue */
-  --accent: #2196F3;
+  --accent: #06b6d4;
   --accent-foreground: oklch(1 0 0);
   
   /* Destructive */
@@ -39,103 +35,97 @@
   --destructive-foreground: oklch(0.98 0 0);
   
   /* Borders & Inputs */
-  --border: oklch(0.88 0.015 220);
-  --input: oklch(0.92 0.01 220);
-  --ring: #3FA9FF;
+  --border: oklch(0.90 0.01 250);
+  --input: oklch(0.95 0.008 248);
+  --ring: #2563eb;
   
-  /* Charts - Blue Spectrum */
-  --chart-1: #3FA9FF;
-  --chart-2: #2196F3;
-  --chart-3: #64B5F6;
-  --chart-4: #1976D2;
-  --chart-5: #90CAF9;
+  --chart-1: #2563eb;
+  --chart-2: #06b6d4;
+  --chart-3: #38bdf8;
+  --chart-4: #1d4ed8;
+  --chart-5: #7dd3fc;
   
   /* Layout */
   --radius: 1rem;
   
   /* Sidebar */
-  --sidebar: oklch(0.98 0.008 220);
-  --sidebar-foreground: oklch(0.18 0.02 240);
-  --sidebar-primary: #3FA9FF;
+  --sidebar: oklch(0.975 0.007 246);
+  --sidebar-foreground: oklch(0.24 0.026 257);
+  --sidebar-primary: #2563eb;
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.94 0.02 220);
-  --sidebar-accent-foreground: oklch(0.25 0.02 240);
-  --sidebar-border: oklch(0.88 0.015 220);
-  --sidebar-ring: #3FA9FF;
+  --sidebar-accent: oklch(0.94 0.015 244);
+  --sidebar-accent-foreground: oklch(0.28 0.025 257);
+  --sidebar-border: oklch(0.90 0.01 250);
+  --sidebar-ring: #2563eb;
   
-  /* Glass morphism */
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(63, 169, 255, 0.2);
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(37, 99, 235, 0.14);
   
-  /* Gradients */
-  --gradient-start: #3FA9FF;
-  --gradient-end: #2196F3;
+  --gradient-start: #1d4ed8;
+  --gradient-mid: #2563eb;
+  --gradient-end: #06b6d4;
   
-  /* Shadows */
-  --shadow-horizon-color: 63, 169, 255;
+  --shadow-horizon-color: 37, 99, 235;
+  --hero-strong: #0f172a;
+  --hero-soft: #e0f2fe;
 }
 
 .dark {
-  /* Blue Horizon Color Palette - Dark Mode */
-  --background: oklch(0.12 0.025 240);
-  --foreground: oklch(0.95 0.01 220);
-  --card: oklch(0.16 0.03 240);
-  --card-foreground: oklch(0.95 0.01 220);
-  --popover: oklch(0.16 0.03 240);
-  --popover-foreground: oklch(0.95 0.01 220);
+  /* Aurora Command - Dark Mode */
+  --background: oklch(0.16 0.026 258);
+  --foreground: oklch(0.96 0.008 248);
+  --card: oklch(0.20 0.025 257);
+  --card-foreground: oklch(0.96 0.008 248);
+  --popover: oklch(0.20 0.025 257);
+  --popover-foreground: oklch(0.96 0.008 248);
   
-  /* Primary - Brighter for dark mode */
-  --primary: #4DB6FF;
-  --primary-foreground: oklch(0.12 0.025 240);
+  --primary: #60a5fa;
+  --primary-foreground: oklch(0.17 0.025 258);
   
-  /* Secondary */
-  --secondary: oklch(0.20 0.035 240);
-  --secondary-foreground: oklch(0.95 0.01 220);
+  --secondary: oklch(0.25 0.02 257);
+  --secondary-foreground: oklch(0.96 0.008 248);
   
-  /* Muted */
-  --muted: oklch(0.18 0.03 240);
-  --muted-foreground: oklch(0.62 0.02 220);
+  --muted: oklch(0.22 0.02 257);
+  --muted-foreground: oklch(0.72 0.012 247);
   
-  /* Accent */
-  --accent: #64B5F6;
-  --accent-foreground: oklch(0.12 0.025 240);
+  --accent: #22d3ee;
+  --accent-foreground: oklch(0.17 0.025 258);
   
   /* Destructive */
   --destructive: oklch(0.50 0.20 25);
   --destructive-foreground: oklch(0.98 0 0);
   
   /* Borders & Inputs */
-  --border: oklch(0.26 0.035 240);
-  --input: oklch(0.20 0.03 240);
-  --ring: #4DB6FF;
+  --border: oklch(0.29 0.02 257);
+  --input: oklch(0.23 0.02 257);
+  --ring: #60a5fa;
   
-  /* Charts - Blue Spectrum (brighter for dark) */
-  --chart-1: #4DB6FF;
-  --chart-2: #64B5F6;
-  --chart-3: #90CAF9;
-  --chart-4: #42A5F5;
-  --chart-5: #BBDEFB;
+  --chart-1: #60a5fa;
+  --chart-2: #22d3ee;
+  --chart-3: #7dd3fc;
+  --chart-4: #2563eb;
+  --chart-5: #93c5fd;
   
   /* Sidebar */
-  --sidebar: oklch(0.14 0.028 240);
-  --sidebar-foreground: oklch(0.95 0.01 220);
-  --sidebar-primary: #4DB6FF;
-  --sidebar-primary-foreground: oklch(0.12 0.025 240);
-  --sidebar-accent: oklch(0.20 0.035 240);
-  --sidebar-accent-foreground: oklch(0.95 0.01 220);
-  --sidebar-border: oklch(0.26 0.035 240);
-  --sidebar-ring: #4DB6FF;
+  --sidebar: oklch(0.18 0.025 258);
+  --sidebar-foreground: oklch(0.96 0.008 248);
+  --sidebar-primary: #60a5fa;
+  --sidebar-primary-foreground: oklch(0.17 0.025 258);
+  --sidebar-accent: oklch(0.24 0.02 257);
+  --sidebar-accent-foreground: oklch(0.96 0.008 248);
+  --sidebar-border: oklch(0.29 0.02 257);
+  --sidebar-ring: #60a5fa;
   
-  /* Glass morphism - Dark */
-  --glass-bg: rgba(16, 24, 48, 0.85);
-  --glass-border: rgba(77, 182, 255, 0.25);
+  --glass-bg: rgba(15, 23, 42, 0.68);
+  --glass-border: rgba(96, 165, 250, 0.16);
   
-  /* Gradients - Dark */
-  --gradient-start: #4DB6FF;
-  --gradient-end: #64B5F6;
+  --gradient-start: #0f172a;
+  --gradient-mid: #1d4ed8;
+  --gradient-end: #06b6d4;
   
-  /* Shadows - Dark */
-  --shadow-horizon-color: 77, 182, 255;
+  --shadow-horizon-color: 30, 64, 175;
+  --hero-strong: #020617;
+  --hero-soft: #082f49;
 }
 
 @theme inline {
@@ -214,6 +204,10 @@
   
   body {
     @apply bg-background text-foreground antialiased;
+    background-image:
+      radial-gradient(circle at top left, rgba(var(--shadow-horizon-color), 0.16), transparent 30%),
+      radial-gradient(circle at top right, rgba(6, 182, 212, 0.12), transparent 28%),
+      linear-gradient(180deg, color-mix(in srgb, var(--background) 92%, white 8%) 0%, var(--background) 100%);
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
@@ -241,7 +235,9 @@
   
   /* Professional card styling */
   [data-slot="card"] {
-    @apply transition-all duration-200;
+    @apply transition-all duration-200 border-white/40 dark:border-white/8 bg-white/88 dark:bg-slate-950/55;
+    box-shadow: 0 16px 40px rgba(var(--shadow-horizon-color), 0.08);
+    backdrop-filter: blur(18px);
   }
   
   /* Color scheme */
@@ -387,11 +383,11 @@
    BLUE HORIZON GRADIENTS
    ============================================ */
 .bg-gradient-horizon {
-  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
-  }
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-mid) 52%, var(--gradient-end) 100%);
+}
 
 .bg-gradient-horizon-soft {
-  background: linear-gradient(135deg, rgba(var(--shadow-horizon-color), 0.1) 0%, rgba(var(--shadow-horizon-color), 0.05) 100%);
+  background: linear-gradient(135deg, rgba(var(--shadow-horizon-color), 0.12) 0%, rgba(6, 182, 212, 0.08) 100%);
 }
 
 .bg-gradient-radial {
@@ -546,5 +542,90 @@
   height: 100%;
   border-radius: 9999px;
   transition: all 0.3s ease;
-  background: linear-gradient(90deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+  background: linear-gradient(90deg, var(--gradient-start) 0%, var(--gradient-mid) 55%, var(--gradient-end) 100%);
+}
+
+.surface-panel {
+  border: 1px solid color-mix(in srgb, var(--border) 78%, white 22%);
+  background: color-mix(in srgb, var(--card) 82%, transparent 18%);
+  box-shadow: 0 20px 45px rgba(var(--shadow-horizon-color), 0.09);
+  backdrop-filter: blur(18px);
+}
+
+.surface-panel-muted {
+  border: 1px solid color-mix(in srgb, var(--border) 84%, white 16%);
+  background: color-mix(in srgb, var(--muted) 74%, transparent 26%);
+}
+
+.surface-hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top right, rgba(125, 211, 252, 0.26), transparent 32%),
+    radial-gradient(circle at bottom left, rgba(37, 99, 235, 0.26), transparent 28%),
+    linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-mid) 48%, var(--gradient-end) 100%);
+  color: white;
+}
+
+.surface-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.18), transparent 28%),
+    linear-gradient(320deg, rgba(255, 255, 255, 0.08), transparent 35%);
+  pointer-events: none;
+}
+
+.page-shell {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+}
+
+.page-header-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, white 20%);
+  background: color-mix(in srgb, var(--card) 72%, transparent 28%);
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.page-title {
+  font-size: clamp(1.75rem, 2vw + 1rem, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.grid-overlay {
+  position: relative;
+}
+
+.grid-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.65), transparent 88%);
+  pointer-events: none;
+}
+
+.metric-tile {
+  border: 1px solid color-mix(in srgb, var(--border) 80%, white 20%);
+  background: color-mix(in srgb, var(--card) 78%, transparent 22%);
+  box-shadow: 0 18px 35px rgba(var(--shadow-horizon-color), 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.accent-ring {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 14px 32px rgba(var(--shadow-horizon-color), 0.18);
 }

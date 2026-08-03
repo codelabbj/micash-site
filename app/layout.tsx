@@ -8,8 +8,8 @@ const inter = Inter({ subsets: ["latin"] })
 
 
 export const metadata: Metadata = {
-  title: "1xstore - Gestion de Dépôts et Retraits",
-  description: "Plateforme de gestion de transactions pour paris sportifs",
+  title: "Micash - Gestion de Dépôts et Retraits",
+  description: "Plateforme de gestion de transactions sécurisées pour paris sportifs",
 }
 
 export default function RootLayout({

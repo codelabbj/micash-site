@@ -4,8 +4,8 @@ import api from './api';
 let isInitialized = false;
 
 // Constants for Notification Channel
-const CHANNEL_ID = '1xstore_foreground';
-const CHANNEL_NAME = '1xstore_foreground';
+const CHANNEL_ID = 'brand_foreground';
+const CHANNEL_NAME = 'brand_foreground';
 
 /**
  * Initialize Push Notifications (Web Adapter)

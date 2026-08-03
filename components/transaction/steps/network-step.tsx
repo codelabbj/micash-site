@@ -1,13 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { SafeImage } from "@/components/ui/safe-image"
-import { Loader2 } from "lucide-react"
+import { Loader2, CheckCircle2 } from "lucide-react"
 import { networkApi } from "@/lib/api-client"
 import type { Network } from "@/lib/types"
-import { TRANSACTION_TYPES, getTransactionTypeLabel } from "@/lib/constants"
+import { TRANSACTION_TYPES } from "@/lib/constants"
 
 interface NetworkStepProps {
   selectedNetwork: Network | null
@@ -21,109 +19,76 @@ export function NetworkStep({ selectedNetwork, onSelect, onNext, type }: Network
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const fetchNetworks = async () => {
-      try {
-        const data = await networkApi.getAll(type)
-        // Filter networks based on transaction type
-        const activeNetworks = data.filter(network =>
-          type === TRANSACTION_TYPES.DEPOSIT ? network.active_for_deposit : network.active_for_with
-        )
-        setNetworks(activeNetworks)
-      } catch (error) {
-        console.error("Error fetching networks:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchNetworks()
+    networkApi.getAll(type)
+      .then(data => setNetworks(data.filter((n: Network) =>
+        type === TRANSACTION_TYPES.DEPOSIT ? n.active_for_deposit : n.active_for_with
+      )))
+      .catch(console.error)
+      .finally(() => setIsLoading(false))
   }, [type])
 
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </CardContent>
-      </Card>
-    )
-  }
-
   const isDeposit = type === TRANSACTION_TYPES.DEPOSIT
-  const accentColor = isDeposit ? "emerald" : "orange"
+
+  if (isLoading) return (
+    <div className="flex items-center justify-center py-12">
+      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+    </div>
+  )
+
+  if (networks.length === 0) return (
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+      <p className="text-sm text-muted-foreground">
+        Aucun réseau disponible pour {isDeposit ? "les dépôts" : "les retraits"}
+      </p>
+    </div>
+  )
 
   return (
-    <Card className="border-border/50 overflow-hidden">
-      <CardHeader className="p-4 sm:p-5 pb-3 border-b border-border/50">
-        <CardTitle className="text-base sm:text-lg font-semibold">Choisir un réseau</CardTitle>
-        <CardDescription className="text-xs sm:text-sm mt-1">
-          Sélectionnez votre opérateur mobile
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="p-4 sm:p-5">
-        <div className="grid gap-2.5 sm:gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {networks.map((network) => (
-            <Card
-              key={network.id}
-              className={`group cursor-pointer transition-all duration-200 border-2 overflow-hidden ${selectedNetwork?.id === network.id
-                  ? isDeposit
-                    ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-md shadow-emerald-500/10"
-                    : "border-orange-500 bg-orange-50/50 dark:bg-orange-950/20 shadow-md shadow-orange-500/10"
-                  : "border-border/50 hover:border-border hover:shadow-sm bg-card"
-                }`}
-              onClick={() => {
-                onSelect(network)
-                setTimeout(() => {
-                  onNext()
-                }, 300)
-              }}
-            >
-              <CardContent className="p-3 sm:p-4">
-                <div className="flex items-start gap-3 min-w-0">
-                  <SafeImage
-                    src={network.image}
-                    alt={network.name}
-                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl object-cover flex-shrink-0 ring-1 ring-border/50"
-                    fallbackText={network.public_name.charAt(0).toUpperCase()}
-                  />
-                  <div className="flex-1 min-w-0 space-y-1.5">
-                    <h3 className="font-semibold text-sm sm:text-base text-foreground truncate">{network.public_name}</h3>
-                    <p className="text-[11px] sm:text-xs text-muted-foreground truncate">{network.name}</p>
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {network.active_for_deposit && (
-                        <Badge
-                          variant={isDeposit ? "default" : "secondary"}
-                          className={`text-[10px] sm:text-xs font-medium ${isDeposit ? "bg-emerald-500 hover:bg-emerald-600" : ""
-                            }`}
-                        >
-                          {getTransactionTypeLabel(TRANSACTION_TYPES.DEPOSIT)}
-                        </Badge>
-                      )}
-                      {network.active_for_with && (
-                        <Badge
-                          variant={!isDeposit ? "default" : "secondary"}
-                          className={`text-[10px] sm:text-xs font-medium ${!isDeposit ? "bg-orange-500 hover:bg-orange-600" : ""
-                            }`}
-                        >
-                          {getTransactionTypeLabel(TRANSACTION_TYPES.WITHDRAWAL)}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {networks.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-sm text-muted-foreground break-words">
-              Aucun réseau disponible pour {type === TRANSACTION_TYPES.DEPOSIT ? "les dépôts" : "les retraits"}
-            </p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <div className="space-y-2.5">
+      <p className="text-[13px] text-muted-foreground mb-3">Sélectionnez votre opérateur mobile</p>
+      {networks.map((network) => {
+        const isSelected = selectedNetwork?.id === network.id
+        return (
+          <button
+            key={network.id}
+            type="button"
+            onClick={() => { onSelect(network); setTimeout(onNext, 250) }}
+            className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 text-left transition-all duration-200 ${
+              isSelected
+                ? isDeposit
+                  ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-sm"
+                  : "border-amber-500 bg-amber-50/50 dark:bg-amber-950/20 shadow-sm"
+                : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/50 dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+            }`}
+          >
+            <SafeImage
+              src={network.image}
+              alt={network.name}
+              className="w-11 h-11 rounded-xl object-cover flex-shrink-0 ring-1 ring-slate-200 dark:ring-slate-700"
+              fallbackText={network.public_name.charAt(0).toUpperCase()}
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground truncate">{network.public_name}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{network.name}</p>
+              <div className="flex items-center gap-2 mt-1.5">
+                {network.active_for_deposit && (
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium ${
+                    isDeposit ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400" : "bg-slate-100 dark:bg-slate-800 text-muted-foreground"
+                  }`}>Dépôt</span>
+                )}
+                {network.active_for_with && (
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium ${
+                    !isDeposit ? "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400" : "bg-slate-100 dark:bg-slate-800 text-muted-foreground"
+                  }`}>Retrait</span>
+                )}
+              </div>
+            </div>
+            {isSelected && (
+              <CheckCircle2 className={`w-5 h-5 flex-shrink-0 ${isDeposit ? "text-emerald-500" : "text-amber-500"}`} />
+            )}
+          </button>
+        )
+      })}
+    </div>
   )
 }

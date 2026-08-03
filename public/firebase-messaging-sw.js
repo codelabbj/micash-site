@@ -4,15 +4,21 @@ importScripts('https://www.gstatic.com/firebasejs/11.0.0/firebase-messaging-comp
 
 // Firebase configuration - REPLACE WITH YOUR CONFIG
 const firebaseConfig = {
-  apiKey: "AIzaSyAQPHW4pmoRSX1yIbuF_ljR3CIY3TD-Jwc",
-  authDomain: "xpay-4c814.firebaseapp.com",
-  projectId: "xpay-4c814",
-  storageBucket: "xpay-4c814.firebasestorage.app",
-  messagingSenderId: "739638156695",
-  appId: "1:739638156695:web:74de607a2aed3742af78d2",
-  measurementId: "G-FNK5SHWQFR"
+  apiKey: "AIzaSyAXiRXibyXK2IbSNUlb0GAGrRUDgsd5h6Q",
+  authDomain: "micash-890bd.firebaseapp.com",
+  projectId: "micash-890bd",
+  storageBucket: "micash-890bd.firebasestorage.app",
+  messagingSenderId: "21928347232",
+  appId: "1:21928347232:web:8a0dfee805587e3024a505",
+  measurementId: "G-Q1Y9042CZY"
 };
-
+// apiKey: "AIzaSyAXiRXibyXK2IbSNUlb0GAGrRUDgsd5h6Q",
+//   authDomain: "micash-890bd.firebaseapp.com",
+//   projectId: "micash-890bd",
+//   storageBucket: "micash-890bd.firebasestorage.app",
+//   messagingSenderId: "21928347232",
+//   appId: "1:21928347232:web:8a0dfee805587e3024a505",
+//   measurementId: "G-Q1Y9042CZY"
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 

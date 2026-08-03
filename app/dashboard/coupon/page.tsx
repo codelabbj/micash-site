@@ -15,66 +15,40 @@ export default function CouponPage() {
   const router = useRouter()
   const { user } = useAuth()
 
-  // ── Settings gate ──
   const [isLoadingSettings, setIsLoadingSettings] = useState(true)
   const [couponAccessEnabled, setCouponAccessEnabled] = useState(false)
-
-  // ── Page data ──
   const [coupons, setCoupons] = useState<Coupon[]>([])
   const [platforms, setPlatforms] = useState<Platform[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
 
-  // ────────────────────────────────────────────
-  // Initial load: check settings gate
-  // ────────────────────────────────────────────
   useEffect(() => {
     if (!user) return
     const init = async () => {
       try {
         const settings = await settingsApi.get()
-
         const requiresDeposit = settings?.requires_deposit_to_view_coupon === true
         const minimumRequired: number = settings?.minimun_deposit_before_view_coupon ?? 0
-
         if (!requiresDeposit) {
-          // Flag is OFF → free access, skip transaction check
           setCouponAccessEnabled(true)
           await Promise.all([fetchCoupons(), fetchPlatforms()])
           return
         }
-
-        // Flag is ON → user must have at least one accepted deposit >= minimumRequired
-        const history = await transactionApi.getHistory({
-          type_trans: "deposit",
-          status: "accept",
-          page_size: 100,
-        })
-
-        const hasQualifying = history.results.some(
-          (tx) => tx.amount >= minimumRequired
-        )
-
+        const history = await transactionApi.getHistory({ type_trans: "deposit", status: "accept", page_size: 100 })
+        const hasQualifying = history.results.some((tx: any) => tx.amount >= minimumRequired)
         if (!hasQualifying) {
-          toast.error(
-            `Effectuez un dépôt d'au moins ${minimumRequired.toLocaleString()} FCFA pour accéder aux coupons`
-          )
+          toast.error(`Effectuez un dépôt d'au moins ${minimumRequired.toLocaleString()} FCFA pour accéder aux coupons`)
           router.push("/dashboard")
           return
         }
-
         setCouponAccessEnabled(true)
         await Promise.all([fetchCoupons(), fetchPlatforms()])
-      } catch {
-        router.push("/dashboard")
-      } finally {
-        setIsLoadingSettings(false)
-      }
+      } catch { router.push("/dashboard") }
+      finally { setIsLoadingSettings(false) }
     }
     init()
   }, [user, router])
 
-  // Reload on window focus
   useEffect(() => {
     if (!couponAccessEnabled) return
     const handleFocus = () => fetchCoupons()
@@ -82,33 +56,19 @@ export default function CouponPage() {
     return () => window.removeEventListener("focus", handleFocus)
   }, [couponAccessEnabled])
 
-  // ────────────────────────────────────────────
-  // Data fetching
-  // ────────────────────────────────────────────
   const fetchPlatforms = async () => {
-    try {
-      const data = await platformApi.getAll()
-      setPlatforms(data)
-    } catch (error) {
-      console.error("Error fetching platforms:", error)
-    }
+    try { const data = await platformApi.getAll(); setPlatforms(data) } catch {}
   }
 
   const fetchCoupons = async () => {
     setIsLoading(true)
-    try {
-      const data = await couponApi.getAll(1)
-      setCoupons(data.results)
-    } catch (error) {
-      toast.error("Erreur lors du chargement")
-    } finally {
-      setIsLoading(false)
-    }
+    try { const data = await couponApi.getAll(1); setCoupons(data.results) }
+    catch { toast.error("Erreur lors du chargement") }
+    finally { setIsLoading(false) }
   }
 
   const getPlatformName = (betAppId: string) => {
-    const platform = platforms.find((p) => p.id === betAppId)
-    return platform?.name || "Plateforme"
+    return platforms.find((p) => p.id === betAppId)?.name || "Plateforme"
   }
 
   const copyToClipboard = (code: string) => {
@@ -118,13 +78,10 @@ export default function CouponPage() {
     setTimeout(() => setCopiedCode(null), 2000)
   }
 
-  // ────────────────────────────────────────────
-  // Loading / gate states
-  // ────────────────────────────────────────────
   if (isLoadingSettings) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 text-[#3FA9FF] animate-spin" />
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-7 h-7 text-primary animate-spin" />
       </div>
     )
   }
@@ -132,84 +89,75 @@ export default function CouponPage() {
   if (!couponAccessEnabled) return null
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="space-y-5 pb-6 animate-in fade-in duration-300">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-3">
         <Link
           href="/dashboard"
-          className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground transition-colors"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="w-4 h-4" />
         </Link>
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
-            <Ticket className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-slate-900 dark:text-white">Mes Coupons</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400">{coupons.length} coupon(s)</p>
-          </div>
+        <div className="flex-1">
+          <h1 className="text-lg font-bold text-foreground">Mes Coupons</h1>
+          <p className="text-xs text-muted-foreground">{coupons.length} coupon(s) disponible(s)</p>
         </div>
       </div>
 
       {/* Content */}
       {isLoading ? (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-center py-16">
-          <Loader2 className="w-8 h-8 text-[#3FA9FF] animate-spin" />
+        <div className="flex items-center justify-center py-14">
+          <Loader2 className="w-6 h-6 text-primary animate-spin" />
         </div>
       ) : coupons.length === 0 ? (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center py-16 px-4">
-          <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4">
-            <Ticket className="w-8 h-8 text-slate-400" />
+        <div className="flex flex-col items-center justify-center py-14 px-4 text-center rounded-2xl border border-border/60 bg-card">
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+            <Ticket className="w-5 h-5" />
           </div>
-          <p className="font-medium text-slate-600 dark:text-slate-300">Aucun coupon</p>
-          <p className="text-sm text-slate-400 dark:text-slate-500 mt-1 text-center">
-            Vos coupons apparaîtront ici
+          <p className="text-sm font-semibold text-foreground">Aucun coupon</p>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+            Vos coupons de pari apparaîtront ici dès qu'ils seront disponibles.
           </p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           {coupons.map((coupon) => (
             <div
               key={coupon.id}
-              className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-violet-500/50 transition-colors"
+              className="rounded-2xl border border-border/60 bg-card overflow-hidden"
             >
-              <div className="p-4 border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-mono font-bold text-lg text-slate-900 dark:text-white">
+              <div className="p-4">
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <div className="min-w-0">
+                    <p className="font-mono text-lg font-bold text-foreground tracking-wide truncate">
                       {coupon.code}
                     </p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       {getPlatformName(coupon.bet_app)}
                     </p>
                   </div>
-                  <span className="px-2.5 py-1 rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400 text-xs font-medium">
+                  <span className="flex-shrink-0 px-2 py-1 rounded-lg bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400 text-[10px] font-medium">
                     Coupon
                   </span>
                 </div>
-              </div>
-              <div className="p-4 bg-slate-50 dark:bg-slate-800/50">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs text-slate-500 dark:text-slate-400">Créé le</span>
-                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                <div className="flex items-center justify-between text-xs mb-3">
+                  <span className="text-muted-foreground">Créé le</span>
+                  <span className="font-medium text-foreground">
                     {format(new Date(coupon.created_at), "dd MMM yyyy", { locale: fr })}
                   </span>
                 </div>
                 <button
                   onClick={() => copyToClipboard(coupon.code)}
-                  className="w-full h-10 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-violet-500 hover:text-white hover:border-violet-500 transition-colors"
+                  className={`w-full h-10 rounded-xl flex items-center justify-center gap-2 text-sm font-medium border transition-all duration-200 ${
+                    copiedCode === coupon.code
+                      ? "bg-violet-600 border-violet-600 text-white"
+                      : "border-border text-muted-foreground hover:text-foreground hover:border-primary/40 bg-card"
+                  }`}
                 >
                   {copiedCode === coupon.code ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      Copié!
-                    </>
+                    <><Check className="w-4 h-4" /> Copié!</>
                   ) : (
-                    <>
-                      <Copy className="w-4 h-4" />
-                      Copier le code
-                    </>
+                    <><Copy className="w-4 h-4" /> Copier le code</>
                   )}
                 </button>
               </div>

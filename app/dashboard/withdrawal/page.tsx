@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
-import { TransactionProgressBar } from "@/components/transaction/progress-bar"
 import { ConfirmationDialog } from "@/components/transaction/confirmation-dialog"
 import { PlatformStep } from "@/components/transaction/steps/platform-step"
 import { BetIdStep } from "@/components/transaction/steps/bet-id-step"
@@ -14,8 +13,44 @@ import { transactionApi } from "@/lib/api-client"
 import type { Platform, UserAppId, Network, UserPhone } from "@/lib/types"
 import { toast } from "react-hot-toast"
 import { extractTimeErrorMessage } from "@/lib/utils"
-import { ChevronLeft, ArrowUpFromLine } from "lucide-react"
+import { ChevronLeft, ArrowUpFromLine, Check } from "lucide-react"
 import Link from "next/link"
+
+const STEPS = [
+  { label: "Plateforme" },
+  { label: "ID Pari" },
+  { label: "Réseau" },
+  { label: "Téléphone" },
+  { label: "Montant" },
+]
+
+function StepDots({ current, total }: { current: number; total: number }) {
+  return (
+    <div className="flex items-center gap-0 w-full">
+      {Array.from({ length: total }).map((_, i) => {
+        const done   = i < current - 1
+        const active = i === current - 1
+        return (
+          <div key={i} className="flex items-center flex-1">
+            <div
+              className={`relative flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300 ring-2 ${
+                done   ? "bg-amber-500 text-white ring-amber-500/20" :
+                active ? "text-white ring-amber-500/25" :
+                "bg-muted text-muted-foreground ring-transparent"
+              }`}
+              style={active ? { background: "linear-gradient(135deg,#f59e0b,#ea580c)" } : undefined}
+            >
+              {done ? <Check className="w-3.5 h-3.5" /> : i + 1}
+            </div>
+            {i < total - 1 && (
+              <div className={`flex-1 h-[2px] mx-1 rounded-full transition-all duration-500 ${i < current - 1 ? "bg-amber-400" : "bg-border"}`} />
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 export default function WithdrawalPage() {
   const router = useRouter()
@@ -25,62 +60,32 @@ export default function WithdrawalPage() {
   const totalSteps = 5
 
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(null)
-  const [selectedBetId, setSelectedBetId] = useState<UserAppId | null>(null)
-  const [selectedNetwork, setSelectedNetwork] = useState<Network | null>(null)
-  const [selectedPhone, setSelectedPhone] = useState<UserPhone | null>(null)
-  const [amount, setAmount] = useState(0)
-  const [withdriwalCode, setWithdriwalCode] = useState("")
+  const [selectedBetId,    setSelectedBetId]    = useState<UserAppId | null>(null)
+  const [selectedNetwork,  setSelectedNetwork]  = useState<Network | null>(null)
+  const [selectedPhone,    setSelectedPhone]    = useState<UserPhone | null>(null)
+  const [amount,           setAmount]           = useState(0)
+  const [withdriwalCode,   setWithdriwalCode]   = useState("")
 
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting,       setIsSubmitting]       = useState(false)
 
-  if (!user) {
-    router.push("/login")
-    return null
-  }
+  if (!user) { router.push("/login"); return null }
 
-  const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1)
-    } else {
-      setIsConfirmationOpen(true)
-    }
-  }
+  const handleNext = () => currentStep < totalSteps ? setCurrentStep(s => s + 1) : setIsConfirmationOpen(true)
+  const handlePrev = () => currentStep > 1 && setCurrentStep(s => s - 1)
 
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1)
-    }
-  }
-
-  const handleConfirmTransaction = async () => {
-    if (!selectedPlatform || !selectedBetId || !selectedNetwork || !selectedPhone) {
-      toast.error("Données manquantes pour la transaction")
-      return
-    }
-
+  const handleConfirm = async () => {
+    if (!selectedPlatform || !selectedBetId || !selectedNetwork || !selectedPhone) { toast.error("Données manquantes"); return }
     setIsSubmitting(true)
     try {
-      await transactionApi.createWithdrawal({
-        amount,
-        phone_number: selectedPhone.phone,
-        app: selectedPlatform.id,
-        user_app_id: selectedBetId.user_app_id,
-        network: selectedNetwork.id,
-        withdriwal_code: withdriwalCode,
-        source: "web"
-      })
-      toast.success("Retrait initié avec succès!")
+      await transactionApi.createWithdrawal({ amount, phone_number: selectedPhone.phone, app: selectedPlatform.id, user_app_id: selectedBetId.user_app_id, network: selectedNetwork.id, withdriwal_code: withdriwalCode, source: "web" })
+      toast.success("Retrait initié!")
       router.push("/dashboard")
-    } catch (error: any) {
-      const timeErrorMessage = extractTimeErrorMessage(error)
-      toast.error(timeErrorMessage || "Erreur lors de la création du retrait")
-    } finally {
-      setIsSubmitting(false)
-    }
+    } catch (e: any) { toast.error(extractTimeErrorMessage(e) || "Erreur lors du retrait") }
+    finally { setIsSubmitting(false) }
   }
 
-  const renderCurrentStep = () => {
+  const renderStep = () => {
     switch (currentStep) {
       case 1: return <PlatformStep selectedPlatform={selectedPlatform} onSelect={setSelectedPlatform} onNext={handleNext} type="withdrawal" />
       case 2: return <BetIdStep selectedPlatform={selectedPlatform} selectedBetId={selectedBetId} onSelect={setSelectedBetId} onNext={handleNext} />
@@ -92,62 +97,61 @@ export default function WithdrawalPage() {
   }
 
   return (
-    <div className="max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <Link
-          href="/dashboard"
-          className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
-        >
-          <ChevronLeft className="w-5 h-5" />
+    <div className="pb-8">
+
+      {/* ── Page header ── */}
+      <div className="flex items-center gap-3 mb-6">
+        <Link href="/dashboard" className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground transition-colors flex-shrink-0">
+          <ChevronLeft className="w-4 h-4" />
         </Link>
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
-            <ArrowUpFromLine className="w-5 h-5 text-white" />
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex-shrink-0">
+            <ArrowUpFromLine className="w-4 h-4" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-900 dark:text-white">Retrait</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Étape {currentStep} sur {totalSteps}</p>
+            <h1 className="text-base font-bold text-foreground leading-tight">Effectuer un retrait</h1>
+            <p className="text-xs text-muted-foreground">{STEPS[currentStep - 1]?.label}</p>
           </div>
         </div>
       </div>
 
-      {/* Progress */}
-      <div className="mb-6">
-        <div className="flex gap-1.5">
-          {Array.from({ length: totalSteps }).map((_, i) => (
-            <div
-              key={i}
-              className={`h-1.5 flex-1 rounded-full transition-colors ${i < currentStep ? 'bg-amber-500' : 'bg-slate-200 dark:bg-slate-800'
-                }`}
-            />
-          ))}
-        </div>
-      </div>
+      {/* ── Wizard shell ── */}
+      <div className="overflow-hidden rounded-2xl bg-white dark:bg-slate-900 shadow-horizon ring-1 ring-slate-200/80 dark:ring-slate-800">
 
-      {/* Content */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
-        <div className="p-5">
-          {renderCurrentStep()}
+        {/* step indicator */}
+        <div className="px-5 pt-5 pb-4 border-b border-slate-100 dark:border-slate-800">
+          <StepDots current={currentStep} total={totalSteps} />
+          <div className="flex items-center justify-between mt-3">
+            <p className="text-[12px] font-medium text-muted-foreground">
+              Étape <span className="text-foreground font-semibold">{currentStep}</span> sur {totalSteps} — {STEPS[currentStep - 1]?.label}
+            </p>
+            <p className="text-[11px] text-muted-foreground/60">
+              {Math.round(((currentStep - 1) / totalSteps) * 100)}% complété
+            </p>
+          </div>
         </div>
+
+        {/* content */}
+        <div className="p-5">
+          {renderStep()}
+        </div>
+
+        {/* back */}
         {currentStep > 1 && (
-          <div className="px-5 pb-5">
-            <button
-              onClick={handlePrevious}
-              className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Précédent
+          <div className="px-5 pb-5 pt-0 border-t border-slate-100 dark:border-slate-800">
+            <button onClick={handlePrev} className="mt-4 flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors">
+              <ChevronLeft className="w-3.5 h-3.5" />
+              Étape précédente
             </button>
           </div>
         )}
       </div>
 
-      {/* Confirmation Dialog */}
+      {/* ── Confirmation dialog ── */}
       <ConfirmationDialog
         isOpen={isConfirmationOpen}
         onClose={() => setIsConfirmationOpen(false)}
-        onConfirm={handleConfirmTransaction}
+        onConfirm={handleConfirm}
         transactionData={{ amount, phone_number: selectedPhone?.phone || "", app: selectedPlatform?.id || "", user_app_id: selectedBetId?.user_app_id || "", network: selectedNetwork?.id || 0, withdriwal_code: withdriwalCode }}
         type="withdrawal"
         platformName={selectedPlatform?.name || ""}
