@@ -13,6 +13,7 @@ import {
   ArrowRight, ArrowLeft, Check, CheckCircle2,
 } from "lucide-react"
 import { getBrandConfig } from "@/lib/brand-config"
+import { GoogleButton } from "@/components/google-button"
 
 /* ─────────────────────────────────────────
    Schemas
@@ -238,6 +239,8 @@ export default function SignupPage() {
                 Continuer <ArrowRight className="w-4 h-4" />
               </button>
             </div>
+
+            <GoogleButton mode="register" />
 
           </form>
         )}

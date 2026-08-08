@@ -5,6 +5,7 @@ import { AuthProvider } from "@/lib/auth-context"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "react-hot-toast"
 import { getBrandConfig } from "@/lib/brand-config"
+import { GoogleOAuthProvider } from "@react-oauth/google"
 
 function hexToRgb(hex: string): string {
   const cleanHex = hex.replace("#", "")
@@ -38,17 +39,19 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="light"
-      enableSystem
-      disableTransitionOnChange
-    >
-      <AuthProvider>
-        {children}
-        <Toaster position="top-right" />
-      </AuthProvider>
-    </ThemeProvider>
+    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="light"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <AuthProvider>
+          {children}
+          <Toaster position="top-right" />
+        </AuthProvider>
+      </ThemeProvider>
+    </GoogleOAuthProvider>
   )
 }
 

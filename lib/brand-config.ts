@@ -81,8 +81,8 @@ export function getBrandConfig(): BrandConfig {
     name: "Micash",
     logo: "/micash-logo.png",
     acronym: "MC",
-    apkUrl: "/app-v1.0.1.apk",
-    apkFileName: "micash-v1.0.1.apk",
+    apkUrl: "/app-v1.0.6.apk",
+    apkFileName: "micash-v1.0.6.apk",
     titleSuffix: "Gestion de Dépôts et Retraits",
     description: "Plateforme de gestion de transactions pour paris sportifs",
     colors: {

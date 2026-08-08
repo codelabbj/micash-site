@@ -12,6 +12,7 @@ import { toast } from "react-hot-toast"
 import { Loader2, Eye, EyeOff, Mail, Lock, ArrowLeft, ArrowRight, Download } from "lucide-react"
 import { setupNotifications } from "@/lib/fcm-helper"
 import { getBrandConfig } from "@/lib/brand-config"
+import { GoogleButton } from "@/components/google-button"
 
 /* ── schemas ── */
 const loginSchema = z.object({
@@ -240,6 +241,8 @@ export default function LoginPage() {
                   🔒 Connexion chiffrée SSL · Vos données sont protégées
                 </p>
               </div>
+
+              <GoogleButton mode="login" />
             </form>
 
           ) : forgotStep === 1 ? (
