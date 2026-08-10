@@ -216,7 +216,7 @@ export default function DashboardPage() {
 
       {/* ── Advertisement banner (immediately after hero) ── */}
       {!isLoadingAd && currentAd && (
-        <div className="relative overflow-hidden rounded-2xl border border-border/60 shadow-sm aspect-[16/6] min-h-[130px] max-h-[200px] group">
+        <div className="relative w-full overflow-hidden rounded-2xl border border-border/60 shadow-sm h-[160px] group">
           <Image
             src={currentAd.image_url || currentAd.image || ""}
             alt={currentAd.title || "Publicité"}
@@ -394,3 +394,4 @@ export default function DashboardPage() {
     </div>
   )
 }
+
